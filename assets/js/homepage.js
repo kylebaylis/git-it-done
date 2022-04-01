@@ -1,3 +1,5 @@
+var languageButtonsEl = document.querySelector("#language-buttons");
+
 var userFormEl = document.querySelector("#user-form");
 var nameInputEl = document.querySelector("#username");
 
@@ -72,7 +74,7 @@ var formSubmitHandler = function(event) {
   console.log(event);
 };
 
-// user is there to pass a parameter through - ex that will add the input into the user spot
+// user is there to pass a parameter through - ex that will add the input into the user spot (see formSubmitHandler function)
 var getUserRepos = function(user) {
     // format the github api url
     var apiUrl = "https://api.github.com/users/" + user + "/repos";
@@ -96,4 +98,34 @@ var getUserRepos = function(user) {
   };
 
 userFormEl.addEventListener("submit", formSubmitHandler);
+
+var getFeaturedRepos = function(language) {
+  var apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues";
+
+  fetch(apiUrl).then(function(response) {
+    if (response.ok) {
+      response.json().then(function(data) {
+        displayRepos(data.items, language);
+      });
+    }
+    else {
+      alert("Error: GitHub user not found");
+    }
+  });
+};
+
+// gets language of button you click within the div element
+var buttonClickHandler = function(event) {
+  var language = event.target.getAttribute("data-language");
+  console.log(language);
+
+  if (language) {
+    getFeaturedRepos(language);
+
+    // clear old content
+    repoContainerEl.textContent = "";
+  }
+};
+
+languageButtonsEl.addEventListener("click", buttonClickHandler);
 
